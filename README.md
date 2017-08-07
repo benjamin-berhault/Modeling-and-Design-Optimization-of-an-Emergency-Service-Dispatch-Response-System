@@ -1,6 +1,4 @@
 # Modeling and Design Optimization of an Emergency Service Dispatch Response System
-Master's thesis work
-
-(Upcoming publication)
+Master's thesis work *(Upcoming...)*
 
 The optimal engagement of a rescue team following an emergency call does not necessarily result in the assignment of the one offering the shortest transit delay. It should be used in cases where urgency is known, but this selection should be put into perspective for less critical situations. For these less critical cases, the service coverage preservation should be taken into account in order to ensure a good quality of service for emergency assistance requests with proven severity. Today, information systems for the allocation of rescue services seem to be dissociated from their geographic information system. In order to reach an optimal allocation, these two systems must communicate so that the allocation phase takes into account transit delays and coverage factors. Bearing this in mind, this work defines a logic, identifies challenges, and proposes technologies and architecture for the context of the Paris Fire Brigade. The realization of this IT project should provide the emergency service with real-time quality of service information and an improvement of its allocation system.
