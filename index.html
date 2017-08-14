@@ -1,0 +1,641 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html  PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN"
+  "http://www.w3.org/Math/DTD/mathml2/xhtml-math11-f.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<title>reveal.js</title>
+
+		<link rel="stylesheet" href="css/reveal.css">
+		<link rel="stylesheet" href="css/theme/league.css">
+
+		<!-- Theme used for syntax highlighting of code -->
+		<link rel="stylesheet" href="lib/css/zenburn.css">
+		<link rel="stylesheet" href="custom/bootstrap.min.css">
+
+		<!-- Printing and PDF exports -->
+		<script>
+			var link = document.createElement( 'link' );
+			link.rel = 'stylesheet';
+			link.type = 'text/css';
+			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+			document.getElementsByTagName( 'head' )[0].appendChild( link );
+
+		</script>
+		<script type="text/javascript" async src="plugin/math/MathJax.js?config=MML_CHTML"></script>
+		<style>
+		
+			@font-face {
+				font-family: Lobster;
+				src: url("css/fonts/Lobster_1.4.otf") format("opentype");
+			}
+
+			.cnam_infos header:after { 
+				content: "Conservatoire National des Arts et Métiers, Paris - 5 July 2017"; 
+			}
+
+			.reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+				font-family: 'Lobster';
+			}
+			
+			li {
+				display: block; 
+			}
+			
+			.reveal h1, .reveal h2, .reveal h3, .reveal h4, .reveal h5, .reveal h6 {
+				text-transform: none;
+			}
+			
+			.reveal section img { 
+				background:none; border:none; box-shadow:none; 
+			}
+			
+			.reveal {
+				font-size: 32px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="reveal">
+			<header style="position: absolute;bottom: 20px; left: 20px; z-index:500; font-size:14px;"></header>
+			<div class="slides">
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Modelling and Optimization of the Unit Dispatch System of an Emergency Service</h3>
+					<p style="font-size:0.7em; line-height: 50px;">			
+						Benjamin Berhault
+					</p>
+					<h4>
+						Master thesis defense<br>
+					</h4>
+					<p style="font-size:0.7em;">
+						Specialization : computer science, modelling, and optimization<br>
+						<br>
+						<div style="font-size:0.7em; line-height: 35px; width=50%; float: left; vertical-align:middle">Press the '<font color="cyan">s</font>' key on your keyboard <br> to open the notes window.					</div>
+						
+							<div style="width=50%;">
+								<img style="vertical-align:middle; height:70px; " src="image/pdf.ico">
+								<span style="font-size:0.7em; ">&ensp;<a href="https://www.researchgate.net/publication/319077905_Modelling_and_Optimization_of_the_Unit_Dispatch_System_of_an_Emergency_Service">Thesis</a></span>
+							</div>
+
+					</p>
+
+<!--					<p>&nbsp;</p> -->
+					
+					<aside class="notes">
+Good afternoon, everyone! <br>
+<br>
+For this thesis defence, I will take you through a proposal to improve the dispatch system of an emergency service, focusing specifically on the constraints of the Paris Fire Brigade, where I have been working for just over 13 years now.<br>
+<br>
+The fire-fighters of Paris have the task of fighting and preventing fire in Paris and in the 92, 93, and 94 departments. This activity accounts for only 3% of their 470,000 annual interventions but represents 14% of their workload in man-hours.<br>
+Since 1985, the fire brigade has also been responsible for victim assistance, which today represents more than 82% of the number of interventions but 68% of the man-hour load.<br>
+<br>
+The other missions of the fire and rescue services in France concern:
+<ul>
+	<li>road accidents (rescue operations of persons, which may extend to extrication operations), </li>
+	<li>animals (injured or dangerous animals), </li>
+	<li>incidents relating to water (flood), gas (gas leak), and electricity (electric cables falling on the road) </li>
+	<li>decontamination and people-search missions (for example, following a missing person notice for a person who ventured into the Paris catacombs) </li>
+</ul>
+The most common team dispatch is currently an ambulance composed of three fire-fighters in charge of victim-relief missions. <br>
+This type of team is frequently sent on requests that are not proven emergencies. Thus, a large part of their interventions involve requests where lives are not threatened. <br>
+<br>
+If, for the victim-relief mission, the standard is an ambulance of three fire-fighters, the typical dispatch for fire is a module of two fire trucks, one aerial ladder, and a total of 14 fire-fighters. <br>
+Various first-rescue modules are predefined to deal with different alert patterns. The biggest one defined so far deals with an aircraft crash, and comprises about 50 vehicles and more than 160 fire-fighters. <br>
+<br>
+					</aside>
+				</section>
+				<section data-state="cnam_infos">
+					<ol>
+						<li class="fragment" style="height: 60px;">Motivations</li>
+						<li class="fragment" style="height: 60px;">Calculation methods</li>
+						<li class="fragment" style="height: 60px;">Frameworks</li>
+						<li class="fragment" style="height: 60px;">Selected architecture</li>
+						<li class="fragment" style="height: 60px;">Conclusion</li>
+					</ol>
+					<aside class="notes">
+During this presentation, I will address:
+<ul>
+	<li>first, the motivations that led me to choose this topic,</li>
+	<li>the relevant calculation methods,</li>
+	<li>the frameworks that seemed preferable for the problem and within the context of the fire brigade,</li>
+	<li>the chosen architecture,</li>
+	<li>and finally a conclusion.</li>
+</ul>
+					</aside>
+				</section>
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Motivation</h3>
+					<ul>
+							<li class="fragment" style="height: 60px;">Improve the quality of service of an emergency service</li>
+							<li class="fragment" style="font-size:0.7em;">Improve the information available to the manager regarding: 
+								<ul>
+									<li class="fragment"> &bull; the response capacity </li>
+									<li class="fragment"> &bull; and the service coverage</li>
+								</ul>
+							</li>
+					</ul>
+					<aside class="notes">
+I joined the Paris Fire Brigade in 2003. When I decided to enlist with the Paris Fire Brigade, I thought I would be closing the professional track that was part of my first university training—a technology degree in electronics. <br>
+Choosing to integrate an emergency service was the consequence of a fundamental need to be useful by helping others. I deeply loved my activity as a rescue professional during the seven years that I practiced in fire stations. <br>
+So, when it was necessary to define the topic for an engineer’s thesis, I did so by following the same initial inspiration that had brought me to the Paris Fire Brigade. I asked myself the following questions: <br>
+<ul>
+	<li>‘What IT project can I choose whose aim would be to improve the core business of an emergency service?’</li>
+	<li>‘What project would enable the emergency service to carry out its mission more effectively?’</li>
+</ul>
+These reflections and thoughts brought me back to one question: ‘How can I improve the quality of service of an emergency service?’ <br>
+I was drawn to a more specific question too: <br>
+‘How can I improve the general information available to the manager, as well as their knowledge of the fire brigade’s response capacity and service coverage?’ ‘The coverage of the service can be defined as a measurement, a representation of its capacity to respond in number and time to a request at any point in its jurisdiction.’ <br>
+Concerning this notion of coverage, we can be more precise by distinguishing between immediate coverage and capacity coverage. <br>
+<ul>
+	<li>Immediate coverage focuses on the given location. How long will it take for a first team to reach this location? </li>
+	<li>Capacity coverage answers a slightly different question for a given location. How many teams can be on site within a given timeframe? In urban areas an emergency service tends to be able to dispatch for any address within its jurisdiction a first team in a timeframe of 10 minutes. </li>
+</ul>
+With better control of this coverage information, the managers of management centres will be able to take better decisions not only for the dispatching teams but also for one-off reallocations. The aim is to restore the quality of service in an area that is deprived of means following the load of heavy demand. <br>
+						</aside>
+					</section>
+					<section data-state="cnam_infos" data-transition="none">
+						<h3>Current visualization of the service status</h3>
+						<img data-src="image/BSPP_en.jpg" width="75%">
+						<aside class="notes">
+In terms of organization, the fire brigade has a central command organ located at Porte de Champerret in Paris as well as three satellite command organs, each managing the units of a third of the Paris Fire Brigade jurisdiction. The latter follow up on the operations and honour requests for reinforcement of the teams that are already involved.
+						</aside>
+					</section>
+					<section data-state="cnam_infos" data-transition="none">
+						<h3>Current visualization of the service status</h3>
+						<img data-src="image/current_visualization_service_status.png" width="60%">
+						<aside class="notes">
+Here is the type of representation that the service uses today to assess its coverage. <br>
+The representation simply follows the limits of the administrative jurisdictions of the fire stations. <br>
+For a given service, red indicates to the manager that the fire station has no more available teams providing this service. Yellow indicates that only one team is left while green states that two or more teams are available. <br>
+The managers are used to this system and are good at working with it. However, I believe we can go further in terms of representation and that this will improve the efficiency of the service.
+						</aside>
+					</section>
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Emergency services</h3>
+					<p class="fragment">What does their effectiveness depend on?</p> 
+					<img data-src="image/post-it_human_and_material_resources.png" width="22%" class="fragment">
+					<img data-src="image/post-it_training_of_the_crews.png" width="22%" class="fragment">
+					<img data-src="image/post-it_sensitization_of_the_population.png" width="22%" class="fragment">
+					<img data-src="image/post-it_arrival_time_of_rescue_teams.png" width="22%" class="fragment">
+					<p>&nbsp;</p>
+					
+					<aside class="notes">
+So, you want to improve the quality of an emergency service. Very well. But what does it depend on? <br>
+You can increase human and material resources but it is extremely expensive. Of the €360 million budget allocated to the fire brigade, more than €300 million represents only the payroll expenses. <br>
+You can also improve the training of the crews. But the institution is already extremely active in this regard and is constantly reinventing itself. <br>
+You can educate the public about the right actions to take in an emergency situation. In Paris, an effort has been made in this regard after the terrorist attack of 13 November 2015. <br>
+Finally, you can try to reduce the arrival time of the rescue teams. By bringing a first team to the scene more quickly, you increase the chances of survival of victims with serious diseases and injuries. In the case of a fire, you can limit the risk of expansion and increase the chance of rescuing people. <br>
+<br>
+Among these different axes to improve the quality of service, the one that leaves room for improvement and where an IT tool can provide answers is this last point: ensuring better control over the arrival time of the relief team. <br>
+In this regard, the most important aspect is the transit time, which depends on the route taken to get to the place of the request. <br>
+The most effective way to act on this transit time is by a more judicious selection of the team to dispatch than is currently the case. <br>
+					</aside>
+				</section>
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Limitations of the current system</h3>
+						<ul>
+							<li class="fragment" style="height: 60px;">Available teams are considered to be located at the fire station</li>
+							<li class="fragment" style="height: 60px;">No consideration of the traffic congestion</li>
+							<li class="fragment" style="height: 60px;">No consideration of the resulting coverage</li>
+						</ul>
+					<aside class="notes">
+Within the current emergency dispatch system, whether the teams are located at the fire station or at a park within their jurisdiction for the Sunday-morning football game, <br>
+<ul>
+	<li>they are currently considered as starting from their fire station. </li>
+</ul>
+There are some other problems too: <br>
+<ul>
+	<li>Traffic congestion is not considered by the system, even though it can significantly delay the arrival of a rescue team. </li>
+	<li>The resulting coverage following a team’s dispatch is not considered. </li>
+</ul>
+To remedy these problems, it is necessary to look at the route calculation methods.
+					</aside>
+				</section>		
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Methods of calculation</h3>
+
+						<ul>
+							<li class="fragment" style="height: 60px;">Systematically estimate the shortest time</li>
+							<li class="fragment" style="height: 60px;">Among <math xmlns="http://www.w3.org/1998/Math/MathML"><mi>n</mi></math> points of departure towards a destination</li>
+							<li class="fragment" style="height: 60px;">Take into account the road segment weighting changes</li>
+							<li class="fragment" style="height: 60px;">Retrieve the covered segments</li>
+							<li class="fragment" style="height: 60px;">Being fast enough</li>
+						</ul>
+					<aside class="notes">
+What do we look for among the different calculation methods for the shortest path? 
+<ol>
+	<li>We want to systematically arrive at the shortest time (which dismisses the A-star algorithm for a road graph).</li>
+	<li>More than a simple departure–destination calculation, we want to ensure the shortest delay among several departure location options to one destination (from several fire stations to one request for relief).</li>
+	<li>It is desirable that the method takes into account the weighting changes of road segments (corresponding to fluctuations in traffic affecting rescue teams) and that too within a very short period of time (i.e. not having to wait a few minutes for this information to become usable).</li>
+	<li>We want to be able to extract the covered road sections, which should be reachable in under 10 minutes.</li>
+	<li>It is hoped that the practical implementation of this method of calculation will be fast enough to be used in an emergency dispatch application.</li>
+</ol>
+Here are some methods that could be used:
+					</aside>
+				</section>	
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Calculation of the shortest <font color="grey"><del>path</del></font> time</h3>
+
+					<ul>
+						<li class="fragment" style="height: 60px;">Dijkstra (1959)</li>
+						<li class="fragment" style="height: 60px;">Lookup table</li>
+						<li class="fragment" style="height: 60px;">Hub Labels (Abraham et al. 2011)</li>
+						<li class="fragment" style="height: 60px;">Contraction hierarchies (Geisberger et al. 2008)</li>
+						<li style="height: 60px;">&nbsp;</li>
+					</ul>
+				<aside class="notes">
+Dijkstra is perfectly capable of answering the first four points listed above. However, the fifth point, concerning the speed of execution, could begin to be a problem. Among the methods that exist for this type of problem, it is also the slowest one. <br>
+So, let us continue with the others. <br>
+Lookup Table <br>
+If you are looking at the performance in terms of response time, there is nothing faster than a lookup table. With this method, a response can be obtained at the speed of a simple SELECT on a data table. To achieve this, each shortest point-to-point path of the graph needs to be pre-computed. <br>
+But there is problem with this technique. <br>
+<br>
+First and foremost, it consumes a lot of space. For example, the implementation of Bast and collaborators in 2015 for the computation of the shortest point-to-point paths of the whole of the Western Europe road network required a pre-treatment of 145 hours and generated more than one million gigabytes of data (more than one petabyte). <br>
+However, it could become more acceptable if we restrict this computation to the 138,000 road segments of the Paris Fire Brigade database, for which we simply want to know the 10 fire stations offering the shortest-possible arrival times. This is the method used by the fire brigade today thanks to the computations carried out by its geomatics division. <br>
+On the other hand, suppose we wanted to extend this base from any segment to any other segment of the jurisdiction. This would represent nearly 20 billion rows. <br>
+Given today's storage capabilities, this should not be a major problem. The real problem with this technique is that it does not allow a fast consideration of modifications in the graph within a time that is still of interest for an emergency service. <br>
+<br>
+<b>Hub Labels or Hub-labelling Algorithm</b>
+Hub Labels is a method that consumes much fewer resources than the lookup table but is still extremely fast. This method allows at the most with two SELECT actions and the analysis of two strings to compute the shortest path between two vertices of a graph. <br>
+For a graph that is oriented like a road graph, this technique requires the prior computation of two tables from structures constructed using the method of the contraction hierarchies, which I will soon introduce briefly. <br>
+In the end, these two computed tables will have as many rows as nodes present within the graph. For each row (each node), a label will be calculated. <br>
+A label is a string containing the distance information between the current node (the node of the row) and all the other nodes that can be reached with an ascending search on the relative multi-level structure. The advantage of these distances is that they all represent the shortest paths. <br>
+So, for future queries, the search of a shortest path will start from the source on the first table and the destination on the second table, from which it will be search within the labels for the common nodes with the associated distance information. Only the smallest sum of distances will be kept as the shortest path result. <br>
+With this method for the western European road network, the storage decreases from one million gigabytes for the lookup table to only 18 gigabytes, and from a pre-treatment time of 145 hours to 37 minutes. <br>
+If we scale the execution time of the Hub Labels to the size of the Paris Fire Brigade database considering a simplistic linear relationship between the number of nodes of the graph and the pre-processing time, the pre-processing time of the graph of the fire brigade would be 13 seconds.<br>
+<br>
+<b>Contraction Hierarchies</b><br>
+Then, you have the very popular method of contraction hierarchies, which orders the nodes of the graph and introduces shortcuts judiciously. <br>
+For a non-oriented graph, the construction of a single multilevel structure is sufficient. On the other hand, for an oriented graph, such as a road graph, the construction of two multilevel structures is necessary. <br>
+A first multilevel structure is built from a graph representing the original road network. A second multilevel structure is built on the original graph whose directions of circulation have been reversed. <br>
+With the two trees obtained, to reach the shortest path, it is enough to launch the Dijkstra algorithm following the ascending branches simultaneously on the two structures previously built. It would start from the source on the structure resulting from the original graph and from the destination for the other until reaching a common vertex. <br>
+Consider that the pre-processing time follows a linear relationship with respect to the number of nodes of the graph. With the Paris Fire Brigade database, this method would have a pre-treatment time of less than two seconds. <br>
+<br>
+Other methods go further by endeavouring to allow the evolution of the graph without having to systematically rebuild the whole underlying architecture and would continue to offer a very fast execution of the queries. <br>
+					</aside>
+				</section>	
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Methods combining speed and flexibility</h3>
+					<ul>
+						<li style="height: 60px;">Customizable Route Planning (D. Delling & al., 2011)</li>
+						<li style="height: 60px;">Customizable Contraction Hierarchies (J. Dibbelt & al., 2014)</li>
+						<li style="height: 60px;">Personalized Route Planning (S. Funke & S. Storandt, 2015)</li>
+					</ul>
+					<aside class="notes">
+These techniques seem very attractive. If I were in a company like TomTom, HERE, or MapBox, or even a start-up for which route calculation is an important element, I would have plunged into this. It may even have been imperative for me to understand the techniques well and know how to implement them. In such a situation, I would be interested in OSRM supported by the MapBox team and the RoutingKit C++ library realized by the teams at the Karlsruhe Institute of Technology of Germany.
+					</aside>
+				</section>
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Calculation of the shortest <font color="grey"><del>path</del></font> time</h3>
+
+						<ul>
+							<li style="height: 60px;">Dijkstra (1959)</li>
+							<li style="height: 60px;">Lookup table</li>
+							<li style="height: 60px;">Hub Labels (Abraham et al. 2011)</li>
+							<li style="height: 60px;">Contraction hierarchies (Geisberger et al. 2008)</li>
+							<li style="height: 60px;">Customizable methods</li>
+						</ul>
+					<aside class="notes">
+But for the project carried out, there are several reasons it seems judicious to leave aside these techniques and libraries, and to consider the pgRouting framework instead.
+					</aside>
+				</section>
+				<section data-state="cnam_infos" data-transition="none">
+
+					<h3>The pgRouting framework</h3>
+
+						<ul>
+							<li class="fragment" style="height: 60px;">Simple extension of the existing system</li>
+							<li class="fragment" style="height: 60px;">Simplicity in retrieving the coverage information</li>
+							<li class="fragment" style="height: 60px;">Take advantage of the PostGIS functions</li>
+							<li class="fragment" style="height: 60px;">Usage of the SQL language</li>
+							<li class="fragment" style="height: 60px;">Immediate consideration of network changes</li>
+						</ul>
+					<aside class="notes">
+It is particularly suitable because of not only the context of the fire brigade but also the significant advantages of pgRouting: 
+<ul>
+	<li>First, pgRouting can be installed as a PostgreSQL database system extension, which currently supports the institution's mapping data. </li>
+	<li>It makes it relatively easy to retrieve the covered segments within a certain period. This means the coverage information is easily accessible. This is an important feature of the project. Other frameworks do not seem to offer a direct solution and would require further development. </li>
+	<li>There is the possibility of taking advantage of the PostGIS functions (PostGIS is an extension of the PostgreSQL system). One may realize this after starting to code. </li>
+	<li>It becomes possible to carry out queries in SQL (i.e. any programmer or database administrator will quickly be able to understand the queries and to use this tool if necessary). </li>
+	<li>When traffic congestion information becomes available, it will be possible to exploit it and transform it into a weighting on the graph. This information will be immediately considered by the queries. </li>
+</ul>
+In practice, the on-the-fly evaluation of the transit times from the various fire stations, for a given place of request for relief, may be acceptable with this framework. It would be even more interesting if the information from the GPS beacons of the appliances become exploitable in the near future. <br>
+To achieve an acceptable computation time, it is necessary to append a distance filter around the place of the request with a PostGIS function (the other PostgreSQL extension I was talking about).
+					</aside>
+				</section>		
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>The pgRouting framework</h3>
+					<img class="fragment" data-src="image/rue_chemin_vert_rue_amelot.png" width="80%">
+
+					<aside class="notes">
+But what does that mean? <br>
+Take the example of a request for relief: rue du Chemin vert between the 11th and the 4th arrondissements of Paris. <br>
+For this request, you would like to assess the transit times from different fire stations.
+					</aside>
+				</section>	
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>The pgRouting framework</h3>
+					<img data-src="image/search_chemin_vert_paris_no_time.jpg" width="80%">
+
+					<aside class="notes">
+The following graph represents the number of fire stations found on the y-axis for different search radii on the x-axis, while limiting the geometries of the road segment to be considered—here, 1–10 km from the corner of rue du Chemin Vert and rue Amelot. <br>
+For the development environment used, the computation time for the search of the shortest paths of the rescue units, is...
+					</aside>
+				</section>	
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>The pgRouting framework</h3>
+					<img data-src="image/search_chemin_vert_paris.jpg" width="80%">
+
+					<aside class="notes">
+less than 100 milliseconds applying a filter on geometries within a radius of 3 km and 400 milliseconds with a radius of 10 km. <br>
+Without applying a filter for the entire Ile-de-France network, the computation time of the query is 4.3 seconds and 4.7 seconds when retrieving the routes of the shortest paths. <br>
+The speed of pgRouting with a filter, for the evaluation of the transit times, remains fast enough for an appliance dispatch application. <br>
+On the other hand, for on-the-fly coverage calculations, it is well beyond the acceptable time limit. We quickly reach a computation time of more than 10 seconds. <br>
+Yet, we want to consider this coverage information in the decision-making process. <br>
+A very basic example of what we would like in terms of the interface for the call centre operator may clarify why the coverage information is important. <br>
+					</aside>
+				</section>				
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Simulator</h3>
+					<iframe src="" 
+						style="height: 555px;  width: 100%; margin: 0 auto" 
+						frameBorder="0">
+					</iframe>
+					<aside class="notes">
+Consider a request for relief for a sick person on rue du Chemin Vert in Paris. After questioning, this appears to be a low-urgency request. This leaves us a little room for manoeuvre in selecting the team to dispatch.
+					</aside>
+				</section>				
+				
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Simulator</h3>
+					<iframe src="custom/selection_engin.html" 
+						style="height: 555px;  width: 100%; margin: 0 auto" 
+						frameBorder="0">
+					</iframe>
+					<aside class="notes">
+Such a request will be classified as a ‘white’ procedure in our system. Ideally, the system would propose several dispatch possibilities with the resulting coverage information. It would also provide operator guidance, where appropriate, to dispatch a team that has the least impact on coverage. <br>
+Here, the fire stations are represented by a red star. <br>
+The place of request for relief is represented by an orange triangle. <br>
+The route computed by the framework is shown in red dots. <br>
+And the coverage information is restricted to two colours: <br>
+<ul>
+	<li>green for segments reachable within 10 minutes; </li>
+	<li>red for segments that would take longer than 10 minutes to reach. </li>
+</ul>
+Suppose I click on the first option that offers the shortest arrival time. I will notice deterioration in the coverage. Therefore, the application will direct me to the second team in terms of arrival time. <br>
+Computing this coverage information is expensive. So, we must create reusable measures and limit their computation. <br>
+Hold on, we want to use spatial information and operations within the appliance dispatch system. <br>
+Perhaps we should first look at the architecture in place: <br>
+					</aside>
+				</section>
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Existing architecture</h3>
+						<img data-src="image/architecture/architecture00.png" style="max-height: 550px;">
+						
+					<aside class="notes">
+We have a dispatch application named ADAGIO, implemented in C#.
+					</aside>
+				</section>
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Existing architecture</h3>
+						<img data-src="image/architecture/architecture01.jpg" style="max-height: 550px;">
+						
+					<aside class="notes">
+This relies on a Microsoft SQL Server database.
+					</aside>
+				</section>
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Existing architecture</h3>
+						<img data-src="image/architecture/architecture02.jpg" style="max-height: 550px;">
+						
+					<aside class="notes">
+It is also the source of the current service coverage representation data.
+					</aside>
+				</section>
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Existing architecture</h3>
+						<img data-src="image/architecture/architecture03.jpg" style="max-height: 550px;">
+						
+					<aside class="notes">
+We also have a map database under PostgreSQL.
+					</aside>
+				</section>
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Existing architecture</h3>
+						<img data-src="image/architecture/architecture04.jpg" style="max-height: 550px;">
+						
+					<aside class="notes">
+This database feeds various web applications integrated with a Joomla portal.
+					</aside>
+				</section>
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Existing architecture</h3>
+						<img data-src="image/architecture/architecture05.jpg" style="max-height: 550px;">
+						
+					<aside class="notes">
+To update this map database, the geomatics division of the institution relies on a solution from GeoConcept.
+					</aside>
+				</section>
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Existing architecture</h3>
+						<img data-src="image/architecture/architecture06.jpg" style="max-height: 550px;">
+						
+					<aside class="notes">
+We would like to be able to query the map database directly from the dispatch application. <br>
+Unfortunately, these two elements are on two different machines under two different operating systems.
+					</aside>
+				</section>
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Existing architecture</h3>
+						<img data-src="image/architecture/architecture07.jpg" style="max-height: 550px;">
+						
+					<aside class="notes">
+There is currently no automated communication between these two systems.
+					</aside>
+				</section>
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Existing architecture</h3>
+						<img data-src="image/architecture/architecture08.jpg" style="max-height: 550px;">
+						
+					<aside class="notes">
+					</aside>
+				</section>
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Existing architecture</h3>
+						<img data-src="image/architecture/architecture09.jpg" style="max-height: 550px;">
+						
+					<aside class="notes">
+Today, the update actions are performed from a desktop application that only a technician is empowered to use.
+					</aside>
+				</section>
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Existing architecture</h3>
+						<img data-src="image/architecture/architecture10.jpg" style="max-height: 550px;">
+						
+					<aside class="notes">
+Hence, the use of pgRouting in the relief engagement process is compromised because of the architecture in place. <br>
+This kind of problem has several solutions. <br>
+There are several types of messages and communication protocols that could be used. So, another technological choice needs to be made.
+					</aside>
+				</section>	
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Choosing a technology</h3>
+						<p class="fragment" style="height: 30px;">Robustness</p>
+						<p class="fragment" style="height: 30px;">Speed</p>
+						<p class="fragment" style="height: 30px;">Good documentation</p>
+						<p class="fragment" style="height: 30px;">Facilitates maintenance</p>
+						<p class="fragment" style="height: 30px;">Suitable for your needs</p>
+					<aside class="notes">
+What if an inter-system communication protocol was already being used by the institution? It would be necessary to consider this first. If this proved unsuitable, it would be necessary to try and find the best solution. <br>
+What are you looking for when choosing a new technology? <br>
+<ul>
+	<li>Robustness</li>
+	<li>Speed</li>
+	<li>Good documentation</li>
+	<li>Facilitates maintenance</li>
+	<li>Suitable for your needs</li>
+</ul>
+Today, to solve a problem of inter-system communication, you could end up considering three protocols: Avro, Thrift, and gRPC. I have a preference for gRPC and its default message format protocol buffers. <br>
+To make it more complete, it would have been useful to contrast the gRPC–protocol buffers combination with the very popular REST-JSON. <br>
+					</aside>
+				</section>	
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>JSON/REST&nbsp; vs&nbsp; protobuf/gRPC</h3>
+
+					<aside class="notes">
+This is something I will focus on now. First, consider the two message formats:
+					</aside>
+				</section>
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Message Format</h3>
+						<table>
+							<tr><td style="text-align:center;"><b>JSON</b></td><td style="text-align:center;"><b>Protobuf</b></td></tr>
+							<tr class="fragment"><td style="text-align:center;">Text</td><td style="text-align:center;">Binary</td></tr>
+							<tr class="fragment"><td style="text-align:center;">Human-readable</td><td style="text-align:center;">Machine-readable</td></tr>
+							<tr class="fragment"><td style="text-align:center;">Repetitive</td><td style="text-align:center;">Compressed</td></tr>
+							<tr class="fragment"><td style="text-align:center;">Universal support</td><td style="text-align:center;">Limited support</td></tr>
+						</table>
+						
+					<aside class="notes">
+<ul>
+	<li>One is a character string while the other is a binary string</li>
+	<li>JSON is human-readable while Protobuf is machine-readable</li>
+	<li>JSON is repetitive while the Protobuf message is compressed</li>
+	<li>JSON is universally supported while the other has only limited support to date</li>
+</ul>
+					</aside>
+				</section>	
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>gRPC vs REST</h3>
+						
+					<aside class="notes">
+The gRPC and REST communication methods each have their own points of interest. Depending on your context, you will favour one or the other. For this project, I chose gRPC for the following reasons:
+					</aside>
+				</section>	
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Advantages of gRPC</h3>
+						<ul>
+							<li class="fragment" style="height: 60px;">A common self-descriptive message definition file</li>
+							<li class="fragment" style="height: 60px;">No more manual construction of queries and responses</li>
+							<li class="fragment" style="height: 60px;">Abstraction of low-level operations</li>
+							<li class="fragment" style="height: 60px;">Upward and downward compatibility</li>
+						</ul>
+					<aside class="notes">
+<ul>
+	<li>With gRPC, there is no need to go hunting for the documentation of the API. A .proto file defined at the creation of the service will offer a common interface definition for the different development teams. </li>
+	<li>There will be no more manually created JSON objects. All queries and responses will be strongly typed and generated by the framework. </li>
+	<li>With gRPC, you do not have to deal with communication methods or with low-level network problems as message headers. </li>
+	<li>Finally, there will be no more data analysis errors during the deployment of new structures. The framework ensures the upward and downward compatibility of the requests and responses. </li>
+</ul>
+Here are the main reasons that led me to favour gRPC over REST.
+					</aside>
+				</section>
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Existing architecture</h3>
+						<img data-src="image/architecture/architecture10.jpg" style="max-height: 550px;">
+						
+					<aside class="notes">
+With this communication protocol, we want to enable communication between two systems that do not currently communicate.
+					</aside>
+				</section>
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Target architecture</h3>
+						<img data-src="image/architecture/architecture11.jpg" style="max-height: 550px;">
+						
+					<aside class="notes">
+It would also be interesting if the technician did not have to carry out manual maintenance.
+					</aside>
+				</section>
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Target architecture</h3>
+						<img data-src="image/architecture/architecture12.jpg" style="max-height: 550px;">
+						
+					<aside class="notes">
+Once this communication is in place, you can think of using pgRouting in the process of selecting rescue units and creating a service-side geographic information system that will be queried by the emergency dispatch application.
+					</aside>
+				</section>
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Maintain the response capacity information</h3>
+						<ul>
+							<li class="fragment" style="height: 60px;">Keep up to date:</li>
+							<li class="fragment" style="height: 60px;">&nbsp;&nbsp; &bull;&nbsp; Coverage information for each unit</li>
+							<li class="fragment" style="height: 60px;">&nbsp;&nbsp; &bull;&nbsp; Coverage information for each road segment</li>
+						</ul>
+					<aside class="notes">
+Finally, let us go back to a problem that we advanced earlier: the calculation of the coverage information that costs too much to compute during the team dispatch process. <br>
+The idea is simple. On the one hand, you calculate and store the coverage information for each available rescue team. For each road segment, you: <br>
+<ul>
+	<li>increment a counter as soon as an appliance becomes available, thus ensuring coverage of the segment,</li>
+	<li>and decrement this counter as soon as an appliance covering it becomes unavailable or its change of position places this segment outside its area of coverage</li>
+</ul>
+With such a data structure, the response capacity information becomes available with a simple SELECT statement in the database. This is fast enough to be considered in the processing of an emergency dispatch application.
+					</aside>
+				</section>
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Conclusion</h3>
+
+					<aside class="notes">
+The proposed architecture, besides allowing the operator to dispatch rescue teams more efficiently, should offer the manager a vision of the service that he does not have to date. I am talking about the immediate response information of the service. That is, for any road segment, it should be clear within what time frame the service can dispatch a first team on the site of a request for relief. It would also significantly improve the representation of the response capacity information, increasing the actual resolution of 71 jurisdictions to a resolution of more than 138,000 road segments. <br>
+<br>
+The work carried out has certainly concentrated on a specific emergency service but it can be transposed to other emergency services too. It might even provide elements of response to the problems of other sectors of activity that seek to visualize, measure, and optimize the response of their fleet of agents.
+
+					</aside>
+				</section>				
+				<section data-state="cnam_infos" data-transition="none">
+					<h3>Questions?</h3>
+					<br>
+<ul>
+	<li style="font-size:0.4em; height: 28px;">&nbsp;&nbsp; &bull;&nbsp; B. Berhault. <a href="https://www.researchgate.net/publication/319077905_Modelling_and_Optimization_of_the_Unit_Dispatch_System_of_an_Emergency_Service">Modelling and Optimization of the Unit Dispatch System of an Emergency Service.</a> Conservatoire national des arts et métiers, Paris, 2017.</li>
+	<li style="font-size:0.4em; height: 28px;">&nbsp;&nbsp; &bull;&nbsp; A. Goldberg. <a href="https://www.youtube.com/watch?v=WPrkc78XLhw&t=2198s">Andrew Goldberg: Shortest Path Algorithms: Theory and Practice.</a> <i>YouTube</i>. Stanford University, California USA, 2011.</li>
+	<li style="font-size:0.4em; height: 28px;">&nbsp;&nbsp; &bull;&nbsp; A. Goldberg. <a href="https://www.youtube.com/watch?v=fjirSXt56OI&t=1078s">Hub Labels in Databases: Shortest Paths for the Masses, Andrew Goldberg, Microsoft Research.</a> <i>YouTube</i>. Stanford University, California USA, 2012.</li>
+</ul>
+					<aside class="notes">
+
+					</aside>
+				</section>				
+				
+			</div>
+		</div>
+
+		<script src="lib/js/head.min.js"></script>
+		<script src="js/reveal.js"></script>
+
+		<script>
+			// More info about config & dependencies:
+			// - https://github.com/hakimel/reveal.js#configuration
+			// - https://github.com/hakimel/reveal.js#dependencies
+			Reveal.initialize({
+				dependencies: [
+					{ src: 'plugin/markdown/marked.js' },
+					{ src: 'plugin/markdown/markdown.js' },
+					{ src: 'plugin/notes/notes.js', async: true },
+					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+				]
+			});
+			// Shows the slide number using default formatting
+			Reveal.configure({ slideNumber: true });
+		</script>
+	</body>
+</html>
