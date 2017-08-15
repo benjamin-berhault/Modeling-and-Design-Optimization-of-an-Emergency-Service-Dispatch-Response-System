@@ -5,7 +5,7 @@ The optimal engagement of a rescue team following an emergency call does not nec
 * [Thesis defence](http://benjaminberhault.com/Modelling_and_Optimization_of_the_Unit_Dispatch_System_of_an_Emergency_Service/)
 * [Thesis](https://www.researchgate.net/publication/319077905_Modelling_and_Optimization_of_the_Unit_Dispatch_System_of_an_Emergency_Service)
 
-[![Display the presentation]({{ site.url }}/image/first_slide.jpg)](http://benjaminberhault.com/Modelling_and_Optimization_of_the_Unit_Dispatch_System_of_an_Emergency_Service/)
+[![Watch the video]({{ site.url }}/image/first_slide.jpg)](http://benjaminberhault.com/Modelling_and_Optimization_of_the_Unit_Dispatch_System_of_an_Emergency_Service/)
 
 <iframe src="http://benjaminberhault.com/Modelling_and_Optimization_of_the_Unit_Dispatch_System_of_an_Emergency_Service/" 
   style="height: auto;  width: 100%; margin: 0 auto" 
