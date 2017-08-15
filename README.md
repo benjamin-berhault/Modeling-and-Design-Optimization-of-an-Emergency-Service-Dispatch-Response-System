@@ -12,7 +12,24 @@ The optimal engagement of a rescue team following an emergency call does not nec
   frameBorder="0">
 </iframe>
 
-<div class="video-container">
-    <iframe src="http://www.youtube.com/embed/4aQwT3n2c1Q" height="315" width="560" allowfullscreen="" frameborder="0">
-    </iframe>
+<div class="iframe_container">
+  <iframe src="http://www.youtube.com/embed/E-ONNjFoOx0" frameborder="0" allowfullscreen="allowfullscreen"> </iframe>
 </div>
+
+
+<style>
+.iframe_container {
+	position: relative;
+	padding-bottom: 56.25%; /* 16:9 - this is responsive by adjusting the hight according to the width! */
+	padding-top: 25px;
+	height: 0;
+}
+
+.iframe_container iframe {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+}
+</style>
