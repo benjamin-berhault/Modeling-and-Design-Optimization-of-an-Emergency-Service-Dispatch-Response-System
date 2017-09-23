@@ -24,6 +24,10 @@
 			document.getElementsByTagName( 'head' )[0].appendChild( link );
 
 		</script>
+		
+		<!-- Global Site Tag (gtag.js) - Google Analytics -->
+		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-63901496-3"></script>
+
 		<script type="text/javascript" async src="plugin/math/MathJax.js?config=MML_CHTML"></script>
 		<style>
 		
@@ -639,6 +643,12 @@ The work carried out has certainly concentrated on a specific emergency service 
 			});
 			// Shows the slide number using default formatting
 			Reveal.configure({ slideNumber: true });
+			
+			window.dataLayer = window.dataLayer || [];
+  			function gtag(){dataLayer.push(arguments)};
+  			gtag('js', new Date());
+
+  			gtag('config', 'UA-63901496-3');
 		</script>
 	</body>
 </html>
